@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 import json
+from selenium import webdriver
+import time
 
 class Review:
     def __init__(self, title, reviewText, author, reviewDate, reviewComments, stars, helpfulVotes):
@@ -54,55 +56,73 @@ def getReviewComments(reviewComments):
        print "COMMENT FOUND"
        print comment
    """
-def getProductReviews(asin, pageLimit=3):
+def getProductReviews(asin, pageLimit=2):
    reviews = None
 
    # Get the first review page for product
    url = "http://www.amazon.com/product-reviews/" + str(asin) + "/?showViewpoints=0&sortBy=byRankDescending&pageNumber=1"
+
+   browser=webdriver.Firefox()
+   browser.get(url)
+   for link in browser.find_elements_by_xpath("//a[contains(concat(' ',normalize-space(@class),' '),' a-link-expander ')]"):
+      link.click()
+      time.sleep(5)
+
+   # More review comments button... Need to fix this.
+   """
+   while True:
+       data = browser.find_elements_by_xpath("//span[contains(concat(' ',normalize-space(@class),' '),' more-comments-button ')]")
+       if not data:
+           break
+       else:
+           for link in data:
+               link.click()
+   """
+
+
    
-   # HTTP request to get content
-   r = requests.get(url)
+   reviews = []
+   bs = BeautifulSoup(browser.page_source)
+   maxPageNum = 0
 
-   # Check status to see if it succeeded
-   if (r.status_code == 200): 
-      reviews = []
-      bs = BeautifulSoup(r.content)
-      maxPageNum = 0
+   # Find number of review pages
+   for x in bs.findAll('li', {"class" : "page-button"}):
+     
+      #Remove ugly commas in page numbers e.g. 1,000
+      pageNum = int(x.text.replace(',', ''))
+     
+      if maxPageNum < pageNum:
+        maxPageNum = pageNum
 
-      # Find number of review pages
-      for x in bs.findAll('li', {"class" : "page-button"}):
-         
-         #Remove ugly commas in page numbers e.g. 1,000
-         pageNum = int(x.text.replace(',', ''))
-         
-         if maxPageNum < pageNum:
-            maxPageNum = pageNum
+   #Loop through all the review pages and get the reviews
+   idx = 1
+   while (idx < (maxPageNum + 1) and idx < pageLimit):
+      for x in bs.findAll('div', {"class" : "review"}):
+          review = Review(x.find('a', {"class" : "review-title"}).text.encode('utf-8'),
+                         x.find('span', {"class" : "review-text"}).text.encode('utf-8'),
+                         x.find('a', {"class" : "author"}).text.encode('utf-8'),
+                         x.find('span', {"class" : "review-date"}).text.encode('utf-8'),
+                         None, 
+                         getNumStars(x), 
+                         getHelpfulVotes(x))
+          reviews.append(review)
 
-      #Loop through all the review pages and get the reviews
-      idx = 1
-      while (idx < (maxPageNum + 1) and idx < pageLimit):
-         url = "http://www.amazon.com/product-reviews/" + str(asin) + "/?showViewpoints=0&sortBy=byRankDescending&pageNumber=" + str(idx)
-         r = requests.get(url)
-         for x in bs.findAll('div', {"class" : "review"}):
-             review = Review(x.find('a', {"class" : "review-title"}).text.encode('utf-8'),
-                             x.find('span', {"class" : "review-text"}).text.encode('utf-8'),
-                             x.find('a', {"class" : "author"}).text.encode('utf-8'),
-                             x.find('span', {"class" : "review-date"}).text.encode('utf-8'),
-                             None, 
-                             getNumStars(x), 
-                             getHelpfulVotes(x))
-             reviews.append(review)
-             print review
-         idx += 1
-
-   else:
-      print url + ' returned : ' + str(r.status_code)
+      url = "http://www.amazon.com/product-reviews/" + str(asin) + "/?showViewpoints=0&sortBy=byRankDescending&pageNumber=" + str(idx)
+      browser.get(url)
+      for link in browser.find_elements_by_xpath("//a[contains(concat(' ',normalize-space(@class),' '),' a-link-expander ')]"):
+         link.click()
+         time.sleep(5)
+      bs = BeautifulSoup(browser.page_source)
+      idx += 1
+      time.sleep(30)
+   
+   browser.close()
    
    return reviews
 
 def main():
-   print getProductReviews('B00F3J4NSI')
-   print getProductReviews('B00X4WHP5E')
+   getProductReviews('B00F3J4NSI')
+   getProductReviews('B00X4WHP5E')
    return 0
 
 if __name__ == '__main__':
