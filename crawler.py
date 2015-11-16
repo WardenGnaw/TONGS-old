@@ -7,6 +7,9 @@ import requests
 import json
 from selenium import webdriver
 import time
+import argparse
+from random import randint
+
 
 class Review:
     def __init__(self, title, reviewText, author, reviewDate, reviewComments, stars, helpfulVotes):
@@ -56,7 +59,7 @@ def getReviewComments(reviewComments):
        print "COMMENT FOUND"
        print comment
    """
-def getProductReviews(asin, pageLimit=2):
+def getProductReviews(asin, subcomments, pageLimit=2):
    reviews = None
 
    # Get the first review page for product
@@ -64,9 +67,10 @@ def getProductReviews(asin, pageLimit=2):
 
    browser=webdriver.Firefox()
    browser.get(url)
-   for link in browser.find_elements_by_xpath("//a[contains(concat(' ',normalize-space(@class),' '),' a-link-expander ')]"):
-      link.click()
-      time.sleep(5)
+   if subcomments:
+       for link in browser.find_elements_by_xpath("//a[contains(concat(' ',normalize-space(@class),' '),' a-link-expander ')]"):
+          link.click()
+          time.sleep(5)
 
    # More review comments button... Need to fix this.
    """
@@ -109,20 +113,48 @@ def getProductReviews(asin, pageLimit=2):
 
       url = "http://www.amazon.com/product-reviews/" + str(asin) + "/?showViewpoints=0&sortBy=byRankDescending&pageNumber=" + str(idx)
       browser.get(url)
-      for link in browser.find_elements_by_xpath("//a[contains(concat(' ',normalize-space(@class),' '),' a-link-expander ')]"):
-         link.click()
-         time.sleep(5)
+      if subcomments:
+          for link in browser.find_elements_by_xpath("//a[contains(concat(' ',normalize-space(@class),' '),' a-link-expander ')]"):
+             link.click()
+             # Wait between 5 to 20 seconds between clicks
+             time.sleep(randint(5, 20))
       bs = BeautifulSoup(browser.page_source)
       idx += 1
-      time.sleep(30)
+      # Wait 30 to 90 seconds per review page
+      time.sleep(randint(30, 90))
    
    browser.close()
    
    return reviews
 
 def main():
-   getProductReviews('B00F3J4NSI')
-   getProductReviews('B00X4WHP5E')
+   parser = argparse.ArgumentParser(description='Scraping Amazon Reviews\nNOTE: Slow because we do not want to spam Amazon.com')
+   parser.add_argument('-f', action="store", dest="filename", help="Read ASINS from a file")
+   parser.add_argument('-subcomments', action="store_true", default=False, dest="subcomments", help="Enable reading comment's comments")
+   parser.add_argument('-asins', action='append', default=[], dest='asins', help="List of asins to scrape")
+
+   results, unknown = parser.parse_known_args()
+   
+   list_reviews = []
+   if results.filename:
+      print "NOT IMPLEMENTED YET"
+   elif results.asins:
+       for asin in results.asins:
+           list_reviews.append(getProductReviews(asin, results.subcomments))
+           # Wait between 30 to 90 seconds
+           time.sleep(randint(30, 90))
+   else:
+       for asin in unknown:
+           list_reviews.append(getProductReviews(asin, results.subcomments))
+           # Wait between 30 to 90 seconds
+           time.sleep(randint(30, 90))
+   
+   # list_reviews is a list of reviews
+   for reviews in list_reviews:
+       # For each review, print out the review
+       # TODO: Modify argparse so it writes to a file
+       for review in reviews:
+           print review
    return 0
 
 if __name__ == '__main__':
