@@ -52,6 +52,7 @@ def getHelpfulVotes(review):
        return None
 
 def getReviewComments(reviewComments):
+   # TODO: Do something meaningful with sub comments
    ret = []
    print reviewComments
    """
@@ -72,7 +73,8 @@ def getProductReviews(asin, subcomments, pageLimit=2):
           link.click()
           time.sleep(5)
 
-   # More review comments button... Need to fix this.
+   # TODO: More review comments button... Need to fix this.
+   # Only currently getting the top subcomments per comment
    """
    while True:
        data = browser.find_elements_by_xpath("//span[contains(concat(' ',normalize-space(@class),' '),' more-comments-button ')]")
