@@ -121,8 +121,7 @@ def getProductReviews(asin, subcomments, pageLimit):
       bs = BeautifulSoup(browser.page_source)
       idx += 1
       # Wait 30 to 90 seconds per review page
-      #time.sleep(randint(30, 90))
-      print "idx " + str(idx)
+      time.sleep(randint(30, 90))
    
    browser.close()
    
