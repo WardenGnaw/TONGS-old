@@ -133,6 +133,7 @@ def getProductReviews(asin, subcomments, pageLimit):
 def main():
    parser = argparse.ArgumentParser(description='Scraping Amazon Reviews\nNOTE: Slow because we do not want to spam Amazon.com')
    parser.add_argument('-f', action="store", dest="filename", help="Read ASINS from a file")
+   parser.add_argument('-o', action="store", dest="output", help="Output results to a file")
    parser.add_argument('-subcomments', action="store_true", default=False, dest="subcomments", help="Enable reading comment's comments")
    parser.add_argument('-asins', action='append', default=[], dest='asins', help="List of asins to scrape")
    parser.add_argument('-n', action='store', default=5, dest='numPages', help="Number of pages to read (default 5)")
@@ -153,12 +154,19 @@ def main():
            # Wait between 30 to 90 seconds
            time.sleep(randint(30, 90))
    
+   file = None
+   if results.output:
+      file = open(results.output, 'w')
+
    # list_reviews is a list of reviews
    for reviews in list_reviews:
-       # For each review, print out the review
-       # TODO: Modify argparse so it writes to a file
        for review in reviews:
-           print review
+          # Write to file
+          if file:
+             file.write(review)
+          # Print to standard out
+          else:
+             print review
    return 0
 
 if __name__ == '__main__':
