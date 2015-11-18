@@ -60,7 +60,7 @@ def getReviewComments(reviewComments):
        print "COMMENT FOUND"
        print comment
    """
-def getProductReviews(asin, subcomments, pageLimit=2):
+def getProductReviews(asin, subcomments, pageLimit):
    reviews = None
 
    # Get the first review page for product
@@ -84,8 +84,6 @@ def getProductReviews(asin, subcomments, pageLimit=2):
            for link in data:
                link.click()
    """
-
-
    
    reviews = []
    bs = BeautifulSoup(browser.page_source)
@@ -123,7 +121,8 @@ def getProductReviews(asin, subcomments, pageLimit=2):
       bs = BeautifulSoup(browser.page_source)
       idx += 1
       # Wait 30 to 90 seconds per review page
-      time.sleep(randint(30, 90))
+      #time.sleep(randint(30, 90))
+      print "idx " + str(idx)
    
    browser.close()
    
@@ -134,6 +133,7 @@ def main():
    parser.add_argument('-f', action="store", dest="filename", help="Read ASINS from a file")
    parser.add_argument('-subcomments', action="store_true", default=False, dest="subcomments", help="Enable reading comment's comments")
    parser.add_argument('-asins', action='append', default=[], dest='asins', help="List of asins to scrape")
+   parser.add_argument('-n', action='store', default=5, dest='numPages', help="Number of pages to read (default 5)")
 
    results, unknown = parser.parse_known_args()
    
@@ -142,12 +142,12 @@ def main():
       print "NOT IMPLEMENTED YET"
    elif results.asins:
        for asin in results.asins:
-           list_reviews.append(getProductReviews(asin, results.subcomments))
+           list_reviews.append(getProductReviews(asin, results.subcomments, results.numPages))
            # Wait between 30 to 90 seconds
            time.sleep(randint(30, 90))
    else:
        for asin in unknown:
-           list_reviews.append(getProductReviews(asin, results.subcomments))
+           list_reviews.append(getProductReviews(asin, results.subcomments, results.numPages))
            # Wait between 30 to 90 seconds
            time.sleep(randint(30, 90))
    
