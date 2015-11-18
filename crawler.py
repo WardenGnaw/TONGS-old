@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 import json
+
+from datetime import datetime
 from selenium import webdriver
 import time
 import argparse
@@ -28,7 +30,7 @@ class ReviewComments:
     def __init__(self, author, reviewText, reviewDate):
         self.author = author
         self.reviewText = reviewText
-        self.reviewDate = reviewDate
+        self.reviewDate = datetime.strptime(reviewDate[3:], "%b %d, %Y").isoformat()
 
 def getNumStars(review):
      if (review.find('i', {"class" : "review-rating", "class" : "a-star-0"})): 
@@ -47,9 +49,10 @@ def getNumStars(review):
 def getHelpfulVotes(review):
    votes = review.find('span', {"class" : "review-votes"})
    if (votes):
-       return votes.text
+       votes_ = votes.text.split(' ')
+       return {'num_helpful': int(votes_[0]), 'num_total': int(votes_[2]), 'pct_helpful': float(votes_[0])/int(votes_[2])}
    else:
-       return None
+       return {'num_helpful': None, 'num_total': None, 'pct_helpful': None}
 
 def getReviewComments(reviewComments):
    # TODO: Do something meaningful with sub comments
