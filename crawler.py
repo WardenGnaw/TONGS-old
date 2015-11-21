@@ -33,15 +33,15 @@ class ReviewComments:
         self.reviewDate = datetime.strptime(reviewDate[3:], "%b %d, %Y").isoformat()
 
 def getNumStars(review):
-     if (review.find('i', {"class" : "review-rating", "class" : "a-star-0"})): 
+     if (review.find('i', {"class" : "review-rating", "class" : "a-star-0"})):
          return 0
-     if (review.find('i', {"class" : "review-rating", "class" : "a-star-1"})): 
+     if (review.find('i', {"class" : "review-rating", "class" : "a-star-1"})):
          return 1
-     if (review.find('i', {"class" : "review-rating", "class" : "a-star-2"})): 
+     if (review.find('i', {"class" : "review-rating", "class" : "a-star-2"})):
          return 2
-     if (review.find('i', {"class" : "review-rating", "class" : "a-star-3"})): 
+     if (review.find('i', {"class" : "review-rating", "class" : "a-star-3"})):
          return 3
-     if (review.find('i', {"class" : "review-rating", "class" : "a-star-4"})): 
+     if (review.find('i', {"class" : "review-rating", "class" : "a-star-4"})):
          return 4
      if (review.find('i', {"class" : "review-rating", "class" : "a-star-5"})):
          return 5
@@ -87,17 +87,17 @@ def getProductReviews(asin, subcomments, pageLimit):
            for link in data:
                link.click()
    """
-   
+
    reviews = []
    bs = BeautifulSoup(browser.page_source)
    maxPageNum = 0
 
    # Find number of review pages
    for x in bs.findAll('li', {"class" : "page-button"}):
-     
+
       #Remove ugly commas in page numbers e.g. 1,000
       pageNum = int(x.text.replace(',', ''))
-     
+
       if maxPageNum < pageNum:
         maxPageNum = pageNum
 
@@ -109,8 +109,8 @@ def getProductReviews(asin, subcomments, pageLimit):
                          x.find('span', {"class" : "review-text"}).text.encode('utf-8'),
                          x.find('a', {"class" : "author"}).text.encode('utf-8'),
                          x.find('span', {"class" : "review-date"}).text.encode('utf-8'),
-                         None, 
-                         getNumStars(x), 
+                         None,
+                         getNumStars(x),
                          getHelpfulVotes(x))
           reviews.append(review)
 
@@ -125,9 +125,9 @@ def getProductReviews(asin, subcomments, pageLimit):
       idx += 1
       # Wait 30 to 90 seconds per review page
       time.sleep(randint(30, 90))
-   
+
    browser.close()
-   
+
    return reviews
 
 def main():
@@ -139,7 +139,7 @@ def main():
    parser.add_argument('-n', action='store', default=5, dest='numPages', help="Number of pages to read (default 5)")
 
    results, unknown = parser.parse_known_args()
-   
+
    list_reviews = []
    if results.filename:
       print "NOT IMPLEMENTED YET"
@@ -153,7 +153,7 @@ def main():
            list_reviews.append(getProductReviews(asin, results.subcomments, results.numPages))
            # Wait between 30 to 90 seconds
            time.sleep(randint(30, 90))
-   
+
    file = None
    if results.output:
       file = open(results.output, 'w')
@@ -163,7 +163,7 @@ def main():
        for review in reviews:
           # Write to file
           if file:
-             file.write(review)
+             file.write(str(review) + '\n')
           # Print to standard out
           else:
              print review
