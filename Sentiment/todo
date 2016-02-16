@@ -1,0 +1,11 @@
+Build APIs
+   getWordSentiment(word)
+   getAggSentenceSentiment(sentence)
+   getSentenceSentimentPair(sentence)
+   getAbsSentenceSentiment(sentence)
+   getMaxSentenceSentiment
+   getMinSentenceSentiment
+   getPolarity
+   getPolarizedSentenceSentiment
+   
+   Issue any more funtions that may be missing in this todo.
