@@ -23,3 +23,6 @@ The positive and negative values used to calculate VGS and TCR.
 Valence generated from our "Valence Generation Search" method.
 VGS uses a search engine and compares the number of results returned when a word is searched with known good or bad words (see tcr_terms.csv) for these words.
 See [Detecting Netflix Service Outages Through Analysis Of Twitter Posts](http://digitalcommons.calpoly.edu/cgi/viewcontent.cgi?article=1765&context=theses).
+
+## sentiment-word-list.csv
+http://sentiwordnet.isti.cnr.it/
