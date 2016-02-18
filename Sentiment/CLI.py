@@ -1,7 +1,7 @@
 import sys
 import nltk
 import argparse
-import Word
+import Sentiment
 """
 Setup and parse arguments.
 
@@ -26,6 +26,16 @@ def TokenizeAndTagSentence(sentence):
 
 def main():
    results, unknown = ParseArguments()
+   
+   print("Welcome to the CLI for the SentimentEngine")
+   while True:
+      try:
+         input = raw_input('> ')
+         se = Sentiment.SentimentEngine(input)
+         print se.getAggregiateSentenceSentiment()
+      except EOFError:
+         print("\nGoodbye")
+         break
 
    return 0
 

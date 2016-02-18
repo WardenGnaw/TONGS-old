@@ -1,5 +1,3 @@
-import sys
-import nltk
 import csv
 
 def setupNegativeWordList():
@@ -52,7 +50,7 @@ class ANEWWord:
         return self.__str__()
 
 def setupANEWWordList():
-    anewWordList = []
+    anewWordList = {}
 
     with open('./sentiment-data/anew.csv', 'r') as anewWordListCsv:
         csvreader = csv.reader(anewWordListCsv, delimiter=",", quotechar='"')
@@ -61,51 +59,34 @@ def setupANEWWordList():
         csvreader.next()
 
         for line in csvreader:
-            anewWordList.append(ANEWWord(line[0], line[1], line[2], line[3], 
-                                         line[4], line[5], line[6], line[7]))
+            anewWordList[line[0]] = ANEWWord(line[0], line[1], line[2], line[3], 
+                                         line[4], line[5], line[6], line[7])
 
         return anewWordList
 
-negativeWordsList = setupNegativeWordList()
-positiveWordsList = setupNegativeWordList()
-anewWordList = setupANEWWordList()
+class SentiWord:
+    def __init__(self, pos, ID, positiveValue, negativeValue, word, definition, num):
+        self.pos = pos
+        self.ID = ID
+        self.positiveValue = positiveValue
+        self.negativeValue = negativeValue
+        self.word = word
+        self.definition = definition
+        self.num = num
 
-class SentimentEngine:
-    def __init__(self, sentence):
-        self.rawSentence = sentence
-        self.tokens = nltk.word_tokenize(sentence)
-        self.pos = [pos[1] for pos in nltk.pos_tag(self.tokens)]
-        self.wordsSentiment = [self.getWordSentiment(word.lower()) for word in self.tokens]
-        self.aggregiateSentenceSentiment = sum(self.wordsSentiment)
-        self.absSentenceSentiment = max(abs(i) for i in self.wordsSentiment)
-        self.maxSentenceSentiment = max(self.wordsSentiment)
-        self.minSentenceSentiment = min(self.wordsSentiment)
+def setupSentiWordNetList():
+    sentiWordNetList = {}
 
-    @staticmethod
-    def getWordSentiment(word):
-        if word in negativeWordsList:
-            return -1
-        if word in positiveWordsList:
-            return 1
-        return 0
+    with open('./sentiment-data/sentiment-word-list.csv', 'r') as sentiWordListCsv:
+        csvreader = csv.reader(sentiWordListCsv, delimiter="\t", quotechar='"')
 
-    def getAggregiateSentenceSentiment(self):
-        return self.aggregiateSentenceSentiment
+        for line in csvreader:
+            if not line[0] or line[0].startswith('#'):
+                continue
+            for word in line[4].split(' '):
+                num = word.split('#', 1)[1]
+                word = word.split('#', 1)[0]
+                word = word.replace('_', ' ')
+                sentiWordNetList[(line[0], word, num)] = SentiWord(line[0], line[1], line[2], line[3], word, line[5], num)
 
-    def getAbsSentenceSentiment(self):
-        return self.absSentenceSentiment
-
-    def getMaxSentenceSentiment(self):
-        return self.maxSentenceSentiment
-    
-    def getMinSentenceSentiment(self):
-        return self.minSentenceSentiment
-
-    def getPolarity(word):
-        return 0
-
-def main():
-    return 0
-
-if __name__ == "__main__":
-   sys.exit(main()) 
+        return sentiWordNetList
