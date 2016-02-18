@@ -9,10 +9,6 @@ anewWordList = SetupSentimentData.setupANEWWordList()
 sentiWordNetList = SetupSentimentData.setupSentiWordNetList()
 
 class SentimentEngine:
-    SIMPLE_WORD_LISTS = 0
-    ANEW_WORD_LIST = 1
-    SENTI_WORD_LIST = 2
-
     def __init__(self, sentence):
         self.rawSentence = sentence
         self.tokens = nltk.word_tokenize(sentence)
@@ -25,21 +21,14 @@ class SentimentEngine:
         self.minSentenceSentiment = min(self.wordsSentiment)
 
     @staticmethod
-    def getWordSentiment(word, wordList = SIMPLE_WORD_LISTS):
+    def getWordSentiment(word):
         word = word.lower()
 
-        if wordList == SIMPLE_WORD_LISTS:
-            if word in negativeWordsList:
-                return -1
-            if word in positiveWordsList:
-                return 1
-            return 0
-        elif wordList == ANEW_WORD_LIST:
-            return anewWordList[word].valence
-        elif wordList == SENTI_WORD_LIST:
-            return sentiWordNetList[('a', word, '1')].positiveValue - sentiWordNetList[('a', word, '1')].negativeValue
-        else:
-            return None
+        if word in negativeWordsList:
+            return -1
+        if word in positiveWordsList:
+            return 1
+        return 0
 
     def getAggregiateSentenceSentiment(self):
         return self.aggregiateSentenceSentiment

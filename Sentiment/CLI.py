@@ -27,7 +27,7 @@ def main():
    while True:
       try:
          input = raw_input('> ')
-         se = Sentiment.SentimentEngine(input)
+         se = SentimentEngine.SentimentEngine(input)
          print se.getAggregiateSentenceSentiment()
       except EOFError:
          print("\nGoodbye")
