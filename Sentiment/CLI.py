@@ -1,7 +1,7 @@
 import sys
 import nltk
 import argparse
-import Sentiment
+import SentimentEngine
 """
 Setup and parse arguments.
 
@@ -19,10 +19,6 @@ def ParseArguments():
                        help='file to write to')
 
    return parser.parse_known_args()
-
-def TokenizeAndTagSentence(sentence):
-    tokens = nltk.word_tokenize(sentence)
-    return nltk.pos_tag(tokens)
 
 def main():
    results, unknown = ParseArguments()
