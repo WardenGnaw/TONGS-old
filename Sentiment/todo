@@ -1,11 +1,17 @@
+
+Week 2/14/16 - 2/22/16
+
 Build APIs
-   getWordSentiment(word)
-   getAggSentenceSentiment(sentence)
-   getSentenceSentimentPair(sentence)
-   getAbsSentenceSentiment(sentence)
-   getMaxSentenceSentiment
-   getMinSentenceSentiment
+   [Done] getWordSentiment(word)
+   [Done] getAggSentenceSentiment(sentence)
+   [Done] getSentenceSentimentPair(sentence)
+   [Done] getAbsSentenceSentiment(sentence)
+   [Done] getMaxSentenceSentiment
+   [Done] getMinSentenceSentiment
    getPolarity
    getPolarizedSentenceSentiment
    
    Issue any more funtions that may be missing in this todo.
+
+
+Add pickle to sentiment dictionary

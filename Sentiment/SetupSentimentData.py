@@ -1,10 +1,11 @@
 import csv
+import pickle
 
 def setupNegativeWordList():
     negativeWordsList = []
 
-    with open('./sentiment-data/negative-words.txt', 'r') as negativeWordsFile:
-        for line in negativeWordsFile:
+    with open('./sentiment-data/negative-words.txt', "r", encoding = "ISO-8859-1") as negativeWordsFile:
+        for line in negativeWordsFile.readlines():
 
             # Ignore comment lines and empty lines
             if line[0] != ';' and line.strip():
@@ -56,7 +57,7 @@ def setupANEWWordList():
         csvreader = csv.reader(anewWordListCsv, delimiter=",", quotechar='"')
 
         # Skip the header line
-        csvreader.next()
+        next(csvreader)
 
         for line in csvreader:
             anewWordList[line[0]] = ANEWWord(line[0], line[1], line[2], line[3], 

@@ -26,9 +26,9 @@ def main():
    print("Welcome to the CLI for the SentimentEngine")
    while True:
       try:
-         input = raw_input('> ')
-         se = SentimentEngine.SentimentEngine(input)
-         print se.getAggregiateSentenceSentiment()
+         inputLine = input('> ')
+         se = SentimentEngine.SentimentEngine(inputLine)
+         print(se.getAggregiateSentenceSentiment())
       except EOFError:
          print("\nGoodbye")
          break
