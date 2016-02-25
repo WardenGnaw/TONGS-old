@@ -24,11 +24,13 @@ class SentimentEngine:
             self.polarity.append(curPolarity)
 
         self.pos = [pos[1] for pos in nltk.pos_tag(self.tokens)]
-        self.wordsSentiment = [self.getWordSentiment(word) * self.getPolarity(word) for word in self.tokens]
+        self.wordsSentiment = [self.getWordSentiment(word) for word in self.tokens]
         self.aggregiateSentenceSentiment = sum(self.wordsSentiment)
-        self.absSentenceSentiment = max(abs(i) for i in self.wordsSentiment)
+        self.absSentenceSentiment = max([abs(i) for i in self.wordsSentiment])
         self.maxSentenceSentiment = max(self.wordsSentiment)
         self.minSentenceSentiment = min(self.wordsSentiment)
+        self.polarizedWordSentiment = [self.getWordSentiment(word) * self.getPolarity(word) for word in self.tokens]
+        self.aggregiatePolarizedSentenceSentiment = sum(self.polarizedWordSentiment)
 
     @staticmethod
     def getWordSentiment(word):

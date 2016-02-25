@@ -1,27 +1,38 @@
 import csv
+import os.path
 import pickle
+
 
 def setupNegativeWordList():
     negativeWordsList = []
 
-    with open('./sentiment-data/negative-words.txt', "r", encoding = "ISO-8859-1") as negativeWordsFile:
-        for line in negativeWordsFile.readlines():
+    if os.path.isfile('./pickle/negativeWordsList'):
+        negativeWordsList = pickle.load(open('./pickle/negativeWordsList', 'rb'))
+    else:
+        with open('./sentiment-data/negative-words.txt', "r", encoding = "ISO-8859-1") as negativeWordsFile:
+            for line in negativeWordsFile.readlines():
 
-            # Ignore comment lines and empty lines
-            if line[0] != ';' and line.strip():
-                negativeWordsList.append(line.strip())
+                # Ignore comment lines and empty lines
+                if line[0] != ';' and line.strip():
+                    negativeWordsList.append(line.strip())
+
+            pickle.dump(negativeWordsList, open('./pickle/negativeWordsList', 'wb'))
 
     return negativeWordsList
 
 def setupPositiveWordList():
     positiveWordsList = []
 
-    with open('./sentiment-data/positive-words.txt', 'r') as positiveWordsFile:
-        for line in positiveWordsFile:
-            
-            # Ignore comment lines and empty lines
-            if line[0] != ';' and line.strip():
-                positiveWordsList.append(line.strip())
+    if os.path.isfile('./pickle/positiveWordList'):
+        positiveWordsList = pickle.load(open('./pickle/positiveWordList', 'rb'))
+    else:
+        with open('./sentiment-data/positive-words.txt', 'r') as positiveWordsFile:
+            for line in positiveWordsFile:
+                
+                # Ignore comment lines and empty lines
+                if line[0] != ';' and line.strip():
+                    positiveWordsList.append(line.strip())
+            pickle.dump(positiveWordsList, open('./pickle/positiveWordsList', 'wb'))
 
     return positiveWordsList
 
@@ -53,15 +64,19 @@ class ANEWWord:
 def setupANEWWordList():
     anewWordList = {}
 
-    with open('./sentiment-data/anew.csv', 'r') as anewWordListCsv:
-        csvreader = csv.reader(anewWordListCsv, delimiter=",", quotechar='"')
+    if os.path.isfile('./pickle/anewWordList'):
+        anewWordList = pickle.load(open('./pickle/anewWordList', 'rb'))
+    else:
+        with open('./sentiment-data/anew.csv', 'r') as anewWordListCsv:
+            csvreader = csv.reader(anewWordListCsv, delimiter=",", quotechar='"')
 
-        # Skip the header line
-        next(csvreader)
+            # Skip the header line
+            next(csvreader)
 
-        for line in csvreader:
-            anewWordList[line[0]] = ANEWWord(line[0], line[1], line[2], line[3], 
-                                         line[4], line[5], line[6], line[7])
+            for line in csvreader:
+                anewWordList[line[0]] = ANEWWord(line[0], line[1], line[2], line[3], 
+                                             line[4], line[5], line[6], line[7])
+            pickle.dump(anewWordList, open('./pickle/anewWordList', 'wb'))
 
         return anewWordList
 
@@ -78,16 +93,20 @@ class SentiWord:
 def setupSentiWordNetList():
     sentiWordNetList = {}
 
-    with open('./sentiment-data/sentiment-word-list.csv', 'r') as sentiWordListCsv:
-        csvreader = csv.reader(sentiWordListCsv, delimiter="\t", quotechar='"')
+    if os.path.isfile('./pickle/sentiWordNetList'):
+        sentiWordNetList = pickle.load(open('./pickle/sentiWordNetList', 'rb'))
+    else:
+        with open('./sentiment-data/sentiment-word-list.csv', 'r') as sentiWordListCsv:
+            csvreader = csv.reader(sentiWordListCsv, delimiter="\t", quotechar='"')
 
-        for line in csvreader:
-            if not line[0] or line[0].startswith('#'):
-                continue
-            for word in line[4].split(' '):
-                num = word.split('#', 1)[1]
-                word = word.split('#', 1)[0]
-                word = word.replace('_', ' ')
-                sentiWordNetList[(line[0], word, num)] = SentiWord(line[0], line[1], line[2], line[3], word, line[5], num)
+            for line in csvreader:
+                if not line[0] or line[0].startswith('#'):
+                    continue
+                for word in line[4].split(' '):
+                    num = word.split('#', 1)[1]
+                    word = word.split('#', 1)[0]
+                    word = word.replace('_', ' ')
+                    sentiWordNetList[(line[0], word, num)] = SentiWord(line[0], line[1], line[2], line[3], word, line[5], num)
+            pickle.dump(sentiWordNetList, open('./pickle/sentiWordNetList', 'wb'))
 
         return sentiWordNetList
