@@ -78,7 +78,7 @@ def setupANEWWordList():
                                              line[4], line[5], line[6], line[7])
             pickle.dump(anewWordList, open('./pickle/anewWordList', 'wb'))
 
-        return anewWordList
+    return anewWordList
 
 class SentiWord:
     def __init__(self, pos, ID, positiveValue, negativeValue, word, definition, num):
@@ -109,4 +109,4 @@ def setupSentiWordNetList():
                     sentiWordNetList[(line[0], word, num)] = SentiWord(line[0], line[1], line[2], line[3], word, line[5], num)
             pickle.dump(sentiWordNetList, open('./pickle/sentiWordNetList', 'wb'))
 
-        return sentiWordNetList
+    return sentiWordNetList
