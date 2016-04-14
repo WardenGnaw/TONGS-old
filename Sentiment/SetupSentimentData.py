@@ -79,34 +79,3 @@ def setupANEWWordList():
             pickle.dump(anewWordList, open('./pickle/anewWordList', 'wb'))
 
     return anewWordList
-
-class SentiWord:
-    def __init__(self, pos, ID, positiveValue, negativeValue, word, definition, num):
-        self.pos = pos
-        self.ID = ID
-        self.positiveValue = positiveValue
-        self.negativeValue = negativeValue
-        self.word = word
-        self.definition = definition
-        self.num = num
-
-def setupSentiWordNetList():
-    sentiWordNetList = {}
-
-    if os.path.isfile('./pickle/sentiWordNetList'):
-        sentiWordNetList = pickle.load(open('./pickle/sentiWordNetList', 'rb'))
-    else:
-        with open('./sentiment-data/sentiment-word-list.csv', 'r') as sentiWordListCsv:
-            csvreader = csv.reader(sentiWordListCsv, delimiter="\t", quotechar='"')
-
-            for line in csvreader:
-                if not line[0] or line[0].startswith('#'):
-                    continue
-                for word in line[4].split(' '):
-                    num = word.split('#', 1)[1]
-                    word = word.split('#', 1)[0]
-                    word = word.replace('_', ' ')
-                    sentiWordNetList[(line[0], word, num)] = SentiWord(line[0], line[1], line[2], line[3], word, line[5], num)
-            pickle.dump(sentiWordNetList, open('./pickle/sentiWordNetList', 'wb'))
-
-    return sentiWordNetList
