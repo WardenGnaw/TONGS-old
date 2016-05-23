@@ -3,6 +3,11 @@ from nltk.tokenize import TweetTokenizer
 import SetupSentimentData
 from nltk.corpus import sentiwordnet as swn
 from nltk.wsd import lesk
+from nltk.tree import Tree
+import subprocess
+
+import sys
+import os
 
 # Speed up tagging
 from nltk.tag.perceptron import PerceptronTagger
@@ -14,7 +19,19 @@ positiveWordsList = SetupSentimentData.setupPositiveWordList()
 anewWordList = SetupSentimentData.setupANEWWordList() 
 negationWords = ["no", "not", "doesn't", "neither", "don't", "wasn't", "couldn't", "haven't"]
 
+# Start up the Stanford Parser that is always running. BC SCREW THE BUILT IN ONE
+stanfordPOSCompile = subprocess.Popen(["javac", "-cp", "/Users/Warden-Mac/bin/stanford-corenlp-3.6.0.jar:/Users/Warden-Mac/bin/stanford-corenlp-3.6.0-models.jar:/Users/Warden-Mac/bin/stanford-srparser-2014-10-23-models.jar:/Users/Warden-Mac/bin/slf4j-api.jar:.", "ShiftReduce.java"])
+stanfordPOSCompile.wait()
+if stanfordPOSCompile.returncode != 0:
+    print("Failed to compile")
+    sys.exit(-1)
 
+FNULL = open(os.devnull, 'w')
+stanfordPOS = subprocess.Popen(["java", "-Xmx2g", "-classpath", "/Users/Warden-Mac/bin/stanford-corenlp-3.6.0.jar:/Users/Warden-Mac/bin/stanford-corenlp-3.6.0-models.jar:/Users/Warden-Mac/bin/stanford-srparser-2014-10-23-models.jar:/Users/Warden-Mac/bin/slf4j-api.jar:.", "ShiftReduce"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=FNULL);
+
+if stanfordPOS.poll() != None:
+    print("Failed to start stanfordPOS")
+    sys.exit(-1)
 class InvalidDictionaryException(Exception):
     pass
 
@@ -33,18 +50,29 @@ def convertPOSTagToSimplePOS(pos):
 
 class SentimentSentence:
     def __init__(self, sentence, wordlist):
+        stanfordPOS.stdin.write((sentence + '\n:parse\n').encode('utf-8')) 
+        stanfordPOS.stdin.flush()
+        treeData = stanfordPOS.stdout.readline()
+        successMsg = stanfordPOS.stdout.readline();
+        while successMsg.strip() and ("** Success **").encode('utf-8') not in successMsg:
+            successMsg = stanfordPOS.stdout.readline();
         self.rawSentence = sentence
         self.tokens = TweetTokenizer().tokenize(sentence)
         self.wordlist = wordlist
+        self.tree = Tree.fromstring(treeData.decode('utf-8'))
+        self.treeString = treeData.decode('utf-8')
+
 
         # Setup basic polarity
         self.polarity = 1
 
         # Naive version of detection of a negated sentence.
         for token in self.tokens:
-            if token in negationWords:
+            if token.lower() in negationWords:
                 self.polarity = -1
                 break
+
+
 
         self.pos = [pos[1] for pos in nltk.tag._pos_tag(self.tokens, None, tagger)]
         self.wordsSentiment = [self.getWordSentiment(word, wordlist) for word in self.tokens]

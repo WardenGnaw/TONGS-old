@@ -2,7 +2,6 @@ import csv
 import os.path
 import pickle
 
-
 def setupNegativeWordList():
     negativeWordsList = []
 
@@ -79,3 +78,4 @@ def setupANEWWordList():
             pickle.dump(anewWordList, open('./pickle/anewWordList', 'wb'))
 
     return anewWordList
+
